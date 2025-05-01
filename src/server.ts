@@ -1,3 +1,5 @@
+/* eslint-disable simple-import-sort/imports */
+/* eslint-disable prettier/prettier */
 import dotenv from 'dotenv';
 import next from 'next';
 import nextBuild from 'next/dist/build';
@@ -21,6 +23,7 @@ if (!process.env.PAYLOAD_SECRET) {
 }
 
 const start = async (): Promise<void> => {
+  // eslint-disable-next-line prettier/prettier
   try {
     // Initialize Payload CMS
     await payload.init({

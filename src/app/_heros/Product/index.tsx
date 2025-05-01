@@ -1,5 +1,5 @@
-import React, { Fragment } from 'react'
-import Link from 'next/link'
+import React from 'react'
+import Image from 'next/image'
 
 import { Product } from '../../../payload/payload-types'
 import { AddToCartButton } from '../../_components/AddToCartButton'
@@ -20,10 +20,11 @@ export const ProductHero: React.FC<{
     title,
     categories,
     meta: { image: metaImage, description } = {},
+    thumbnail,
   } = product
 
   return (
-    <Fragment>
+    <Gutter className={classes.productHero}>
       {!stripeProductID && (
         <Gutter>
           <Message
@@ -42,53 +43,44 @@ export const ProductHero: React.FC<{
           />
         </Gutter>
       )}
-      <Gutter className={classes.productHero}>
-        <div className={classes.content}>
-          <div className={classes.categories}>
-            {categories?.map((category, index) => {
-              if (typeof category === 'object' && category !== null) {
-                const { title: categoryTitle } = category
+      <div className={classes.mediaWrapper}>
+        {!metaImage && thumbnail && typeof thumbnail !== 'string' && (
+          <Media imgClassName={classes.image} resource={thumbnail} fill />
+        )}
+      </div>
+      <div className={classes.details}>
+        <div className={classes.categories}>
+          {categories?.map((category, index) => {
+            const { title: categoryTitle } = category
 
-                const titleToUse = categoryTitle || 'Untitled category'
+            const titleToUse = categoryTitle || 'Generic'
 
-                const isLast = index === categories.length - 1
+            const isLast = index === categories.length - 1
 
-                return (
-                  <Fragment key={index}>
-                    {titleToUse}
-                    {!isLast && <Fragment>, &nbsp;</Fragment>}
-                  </Fragment>
-                )
-              }
-
-              return null
-            })}
-          </div>
-          <h1 className={classes.title}>{title}</h1>
-          <div>
-            <p className={classes.description}>
-              {`${description ? `${description} ` : ''}To edit this product, `}
-              <Link href={`${process.env.NEXT_PUBLIC_SERVER_URL}/admin/collections/products/${id}`}>
-                navigate to the admin dashboard
-              </Link>
-              {'.'}
-            </p>
-          </div>
-          <Price product={product} button={false} />
-          <AddToCartButton product={product} className={classes.addToCartButton} />
+            return (
+              <span key={index} className={classes.category}>
+                {titleToUse} {!isLast && <span className={classes.separator}>|</span>}
+              </span>
+            )
+          })}
         </div>
-        <div className={classes.media}>
-          <div className={classes.mediaWrapper}>
-            {!metaImage && <div className={classes.placeholder}>No image</div>}
-            {metaImage && typeof metaImage !== 'string' && (
-              <Media imgClassName={classes.image} resource={metaImage} fill />
-            )}
-          </div>
-          {metaImage && typeof metaImage !== 'string' && metaImage?.caption && (
-            <RichText content={metaImage.caption} className={classes.caption} />
+        <h1 className={classes.title}>{title}</h1>
+        <div className={classes.priceWrapper}>
+          {product.priceJSON?.data?.[0]?.unit_amount && (
+            <p className={classes.price}>
+              {(product.priceJSON.data[0].unit_amount / 100).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+              })}
+            </p>
           )}
         </div>
-      </Gutter>
-    </Fragment>
+        <div className={classes.description}>
+          <RichText content={description} />
+        </div>
+        <Price product={product} button={false} />
+        <AddToCartButton product={product} />
+      </div>
+    </Gutter>
   )
 }
