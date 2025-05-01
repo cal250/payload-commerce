@@ -1,58 +1,52 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-
+import React, { useState } from 'react'
 import { Product } from '../../../payload/payload-types'
 import { useCart } from '../../_providers/Cart'
-import { Button, Props } from '../Button'
 
-import classes from './index.module.scss'
-
-export const AddToCartButton: React.FC<{
+type Props = {
   product: Product
-  quantity?: number
-  className?: string
-  appearance?: Props['appearance']
-}> = props => {
-  const { product, quantity = 1, className, appearance = 'primary' } = props
+}
 
-  const { cart, addItemToCart, isProductInCart, hasInitializedCart } = useCart()
+export const AddToCartButton: React.FC<Props> = ({ product }) => {
+  const [quantity, setQuantity] = useState(1)
+  const { addItem } = useCart()
+  const [isAdding, setIsAdding] = useState(false)
 
-  const [isInCart, setIsInCart] = useState<boolean>()
-  const router = useRouter()
-
-  useEffect(() => {
-    setIsInCart(isProductInCart(product))
-  }, [isProductInCart, product, cart])
+  const handleAddToCart = () => {
+    setIsAdding(true)
+    addItem(product, quantity)
+    setTimeout(() => {
+      setIsAdding(false)
+    }, 1000)
+  }
 
   return (
-    <Button
-      href={isInCart ? '/cart' : undefined}
-      type={!isInCart ? 'button' : undefined}
-      label={isInCart ? `✓ View in cart` : `Add to cart`}
-      el={isInCart ? 'link' : undefined}
-      appearance={appearance}
-      className={[
-        className,
-        classes.addToCartButton,
-        appearance === 'default' && isInCart && classes.green,
-        !hasInitializedCart && classes.hidden,
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      onClick={
-        !isInCart
-          ? () => {
-              addItemToCart({
-                product,
-                quantity,
-              })
-
-              router.push('/cart')
-            }
-          : undefined
-      }
-    />
+    <div className="add-to-cart">
+      <div className="quantity-selector">
+        <button
+          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+          className="quantity-btn"
+          aria-label="Decrease quantity"
+        >
+          -
+        </button>
+        <span className="quantity-display">{quantity}</span>
+        <button
+          onClick={() => setQuantity(quantity + 1)}
+          className="quantity-btn"
+          aria-label="Increase quantity"
+        >
+          +
+        </button>
+      </div>
+      <button
+        className={`add-to-cart-btn ${isAdding ? 'adding' : ''}`}
+        onClick={handleAddToCart}
+        disabled={isAdding}
+      >
+        {isAdding ? 'Adding...' : 'Add to Cart'}
+      </button>
+    </div>
   )
 }
