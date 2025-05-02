@@ -1,14 +1,9 @@
-@import 'theme.scss';
-@import 'colors.scss';
-@import 'type.scss';
-@import 'queries.scss';
-@import 'cart.scss';
-@import 'components/add-to-cart.scss';
-
 @use './queries.scss' as *;
 @use './colors.scss' as *;
 @use './type.scss' as *;
-@import "./theme.scss";
+@import 'theme.scss';
+@import 'cart.scss';
+@import 'components/add-to-cart.scss';
 
 :root {
   --base: 24px;
